@@ -3,9 +3,6 @@ package org.example.ui.components;
 import org.example.ui.Theme;
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 
@@ -15,13 +12,9 @@ public class PanelGrafico extends JPanel {
     private Double limiteB;
 
     public PanelGrafico() {
-        setPreferredSize(new Dimension(380, 320));
-        setMinimumSize(new Dimension(300, 250));
-        setBackground(Theme.CARD);
-        setBorder(new CompoundBorder(
-            new LineBorder(Theme.BORDER, 1, true),
-            new EmptyBorder(8, 8, 8, 8)
-        ));
+        setPreferredSize(new Dimension(480, 250));
+        setMinimumSize(new Dimension(300, 200));
+        setBackground(new Color(0xFAFCFA));
     }
 
     public void actualizarGrafico(String funcion, Double a, Double b) {
@@ -49,15 +42,33 @@ public class PanelGrafico extends JPanel {
         int h = getHeight();
 
         // Fondo del gráfico
-        g2.setColor(Theme.CARD);
+        g2.setColor(new Color(0xFAFCFA));
         g2.fillRect(0, 0, w, h);
 
         if (funcionStr == null || funcionStr.trim().isEmpty()) {
+            g2.setColor(new Color(0xE8EEE9));
+            int midX = w / 2, midY = h / 2 - 12;
+            for (int i = -3; i <= 3; i++) {
+                g2.drawLine(26, midY + i * 28, w - 26, midY + i * 28);
+            }
+            for (int i = -7; i <= 7; i++) {
+                int x = midX + i * 36;
+                if (x > 20 && x < w - 20) g2.drawLine(x, 20, x, h - 52);
+            }
+            g2.setColor(new Color(0xB8D4C5));
+            g2.setStroke(new BasicStroke(2.5f));
+            java.awt.geom.GeneralPath preview = new java.awt.geom.GeneralPath();
+            for (int x = 26; x <= w - 26; x++) {
+                double t = (x - midX) / 75.0;
+                double y = midY - Math.sin(t) * 34 - t * 9;
+                if (x == 26) preview.moveTo(x, y); else preview.lineTo(x, y);
+            }
+            g2.draw(preview);
             g2.setColor(Theme.MUTED);
             g2.setFont(Theme.sans(Font.PLAIN, 13));
-            String msg = "Gráfico 2D del Área bajo la Curva";
+            String msg = "La gráfica aparecerá después del cálculo";
             FontMetrics fm = g2.getFontMetrics();
-            g2.drawString(msg, (w - fm.stringWidth(msg)) / 2, h / 2);
+            g2.drawString(msg, (w - fm.stringWidth(msg)) / 2, h - 22);
             g2.dispose();
             return;
         }
@@ -103,7 +114,7 @@ public class PanelGrafico extends JPanel {
         yMax += ySpan * 0.2;
 
         // Transformación de coordenadas del plano a píxeles
-        int pad = 25;
+        int pad = 34;
         double anchoGrafico = w - 2 * pad;
         double altoGrafico = h - 2 * pad;
 
@@ -115,9 +126,16 @@ public class PanelGrafico extends JPanel {
         int originY = (int) (pad + yMax * scaleY);
 
         // 1. Dibujar Rejilla sutil
-        g2.setColor(new Color(Theme.BORDER.getRed(), Theme.BORDER.getGreen(), Theme.BORDER.getBlue(), 80));
-        g2.drawLine(pad, pad, pad, h - pad);
-        g2.drawLine(pad, h - pad, w - pad, h - pad);
+        g2.setColor(new Color(0xE9EFEB));
+        g2.setStroke(new BasicStroke(1f));
+        for (int i = 0; i <= 6; i++) {
+            int gx = pad + (w - 2 * pad) * i / 6;
+            g2.drawLine(gx, pad, gx, h - pad);
+        }
+        for (int i = 0; i <= 4; i++) {
+            int gy = pad + (h - 2 * pad) * i / 4;
+            g2.drawLine(pad, gy, w - pad, gy);
+        }
 
         // 2. Dibujar Ejes X e Y
         g2.setColor(Theme.MUTED);
@@ -158,13 +176,13 @@ public class PanelGrafico extends JPanel {
             areaPath.closePath();
 
             // Relleno verde translúcido
-            g2.setColor(new Color(61, 220, 151, 65));
+            g2.setColor(new Color(36, 111, 88, 42));
             g2.fill(areaPath);
 
             // Líneas verticales punteadas de los límites a y b
             Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{4.0f}, 0.0f);
             g2.setStroke(dashed);
-            g2.setColor(Theme.AMBER);
+            g2.setColor(new Color(0x85A997));
             g2.drawLine(pxA, pad, pxA, h - pad);
             g2.drawLine(pxB, pad, pxB, h - pad);
 
@@ -201,8 +219,8 @@ public class PanelGrafico extends JPanel {
             }
         }
 
-        g2.setStroke(new BasicStroke(2.2f));
-        g2.setColor(Theme.BLUE);
+        g2.setStroke(new BasicStroke(2.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setColor(Theme.GREEN);
         g2.draw(curvaPath);
 
         // Leyenda

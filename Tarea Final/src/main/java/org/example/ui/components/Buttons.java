@@ -21,7 +21,7 @@ public class Buttons extends JButton {
 
         setFont(Theme.sans(Font.BOLD, tamFuente));
         setForeground(colorTexto);
-        setFocusPainted(false);
+        setFocusPainted(true);
         setBorderPainted(false);
         setContentAreaFilled(false);
         setOpaque(false);
@@ -49,14 +49,20 @@ public class Buttons extends JButton {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         Color c = colorBase;
-        if (getModel().isPressed()) {
+        if (!isEnabled()) {
+            c = Theme.BORDER;
+        } else if (getModel().isPressed()) {
             c = colorBase.darker();
         } else if (hover) {
-            c = colorBase.equals(Theme.CARD) ? Theme.BORDER : colorBase.brighter();
+            c = colorBase.equals(Theme.CARD) ? Theme.CARD_HOVER : colorBase.equals(Theme.GREEN) ? Theme.BLUE : colorBase.brighter();
         }
 
         g2.setColor(c);
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+        if (hasFocus() && isFocusPainted()) {
+            g2.setColor(Theme.BLUE);
+            g2.drawRoundRect(1, 1, getWidth() - 3, getHeight() - 3, 12, 12);
+        }
         g2.dispose();
 
         super.paintComponent(g);

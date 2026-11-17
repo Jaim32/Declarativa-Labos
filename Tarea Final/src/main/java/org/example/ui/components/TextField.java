@@ -17,7 +17,7 @@ public class TextField extends JTextField {
         super(columnas);
         this.ayuda = ayuda;
 
-        setFont(Theme.mono(Font.PLAIN, 16));
+        setFont(Theme.mono(Font.PLAIN, 14));
         setBackground(Theme.CARD);
         setForeground(Theme.TEXT);
         setCaretColor(Theme.TEXT);
@@ -39,7 +39,7 @@ public class TextField extends JTextField {
     private static CompoundBorder crearBorde(Color color) {
         return new CompoundBorder(
             new LineBorder(color, 1, true),
-            new EmptyBorder(8, 12, 8, 12));
+            new EmptyBorder(10, 12, 10, 12));
     }
 
     @Override

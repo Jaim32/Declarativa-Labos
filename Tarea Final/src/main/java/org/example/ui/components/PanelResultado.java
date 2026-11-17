@@ -4,137 +4,118 @@ import org.example.prolog.ResultadoIntegral;
 import org.example.ui.Theme;
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
-public class PanelResultado extends JPanel {
+public class PanelResultado extends SurfacePanel {
     private final JTextArea txtPrimitiva = new JTextArea(2, 20);
-    private final JLabel lblAreaValor = new JLabel("--");
-    private final JLabel lblDetalleCalculo = new JLabel("Ingrese función y límites para calcular");
-    private final JLabel lblEstado = new JLabel("Listo");
+    private final JLabel lblAreaValor = new JLabel("—");
+    private final JTextArea lblDetalleCalculo = new JTextArea("Ingresa una función y pulsa calcular.");
+    private final JLabel lblEstado = new JLabel("Listo para calcular");
 
     public PanelResultado() {
-        super(new BorderLayout(0, 10));
-        setOpaque(false);
+        super(20);
+        setLayout(new BorderLayout(0, 12));
+        JPanel encabezado = new JPanel(new BorderLayout());
+        encabezado.setOpaque(false);
+        JPanel titulos = new JPanel(new GridLayout(2, 1, 0, 3));
+        titulos.setOpaque(false);
+        titulos.add(label("04  /  RESULTADO", 11, Font.BOLD, Theme.GREEN));
+        titulos.add(label("Solución", 18, Font.BOLD, Theme.TEXT));
+        encabezado.add(titulos, BorderLayout.WEST);
+        lblEstado.setFont(Theme.sans(Font.PLAIN, 11));
+        lblEstado.setForeground(Theme.MUTED);
+        encabezado.add(lblEstado, BorderLayout.EAST);
+        add(encabezado, BorderLayout.NORTH);
 
-        // Contenedor principal estilo tarjeta
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Theme.CARD);
-        card.setBorder(new CompoundBorder(
-            new LineBorder(Theme.BORDER, 1, true),
-            new EmptyBorder(14, 16, 14, 16)
-        ));
-
-        // 1. Sección Primitiva F(x)
-        JPanel seccionPrimitiva = new JPanel(new BorderLayout(8, 4));
-        seccionPrimitiva.setOpaque(false);
-
-        JLabel lblTitPrimitiva = new JLabel("PRIMITIVA SIMBÓLICA F(x) + C");
-        lblTitPrimitiva.setFont(Theme.sans(Font.BOLD, 11));
-        lblTitPrimitiva.setForeground(Theme.MUTED);
-
+        JPanel valores = new JPanel(new GridLayout(1, 2, 0, 0));
+        valores.setOpaque(false);
+        JPanel primitiva = new JPanel(new BorderLayout(0, 6));
+        primitiva.setOpaque(false);
+        primitiva.add(label("PRIMITIVA  ·  F(x) + C", 10, Font.BOLD, Theme.MUTED), BorderLayout.NORTH);
         txtPrimitiva.setEditable(false);
+        txtPrimitiva.setFocusable(false);
         txtPrimitiva.setLineWrap(true);
         txtPrimitiva.setWrapStyleWord(true);
-        txtPrimitiva.setFont(Theme.mono(Font.BOLD, 16));
+        txtPrimitiva.setFont(Theme.mono(Font.BOLD, 15));
         txtPrimitiva.setForeground(Theme.TEXT);
         txtPrimitiva.setBackground(Theme.CARD);
-        txtPrimitiva.setBorder(null);
-
-        Buttons btnCopiar = new Buttons("Copiar", Theme.BORDER, Theme.TEXT, 12, 4, 11);
-        btnCopiar.addActionListener(e -> {
-            String t = txtPrimitiva.getText();
-            if (!t.isEmpty() && !t.contains("Sin solución")) {
-                Toolkit.getDefaultToolkit().getSystemClipboard()
-                        .setContents(new StringSelection(t), null);
-                setEstado("Copiado al portapapeles", Theme.BLUE);
+        txtPrimitiva.setText("—");
+        primitiva.add(txtPrimitiva, BorderLayout.CENTER);
+        Buttons copiar = new Buttons("Copiar resultado", Theme.CARD_HOVER, Theme.GREEN, 10, 5, 11);
+        copiar.addActionListener(e -> {
+            String valor = txtPrimitiva.getText();
+            if (!valor.isBlank() && !valor.equals("—") && !valor.startsWith("Sin solución")) {
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(valor), null);
+                setEstado("Copiado al portapapeles", Theme.GREEN);
             }
         });
+        JPanel copiarFila = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        copiarFila.setOpaque(false);
+        copiarFila.add(copiar);
+        primitiva.add(copiarFila, BorderLayout.SOUTH);
 
-        seccionPrimitiva.add(lblTitPrimitiva, BorderLayout.NORTH);
-        seccionPrimitiva.add(txtPrimitiva, BorderLayout.CENTER);
-        seccionPrimitiva.add(btnCopiar, BorderLayout.EAST);
-
-        // Separador
-        JSeparator sep = new JSeparator();
-        sep.setForeground(Theme.BORDER);
-        sep.setBackground(Theme.BORDER);
-        sep.setMaximumSize(new Dimension(Short.MAX_VALUE, 1));
-
-        // 2. Sección Área Bajo la Curva
-        JPanel seccionArea = new JPanel(new BorderLayout(6, 4));
-        seccionArea.setOpaque(false);
-
-        JLabel lblTitArea = new JLabel("VALOR DEL ÁREA BAJO LA CURVA [a, b]");
-        lblTitArea.setFont(Theme.sans(Font.BOLD, 11));
-        lblTitArea.setForeground(Theme.MUTED);
-
-        lblAreaValor.setFont(Theme.mono(Font.BOLD, 22));
+        JPanel area = new JPanel(new BorderLayout(0, 5));
+        area.setOpaque(false);
+        area.setBorder(BorderFactory.createEmptyBorder(0, 18, 0, 0));
+        area.add(label("INTEGRAL DEFINIDA  ·  [a, b]", 10, Font.BOLD, Theme.MUTED), BorderLayout.NORTH);
+        lblAreaValor.setFont(Theme.mono(Font.BOLD, 23));
         lblAreaValor.setForeground(Theme.GREEN);
+        area.add(lblAreaValor, BorderLayout.CENTER);
+        valores.add(primitiva);
+        valores.add(area);
+        add(valores, BorderLayout.CENTER);
 
-        lblDetalleCalculo.setFont(Theme.sans(Font.PLAIN, 12));
+        lblDetalleCalculo.setEditable(false);
+        lblDetalleCalculo.setFocusable(false);
+        lblDetalleCalculo.setLineWrap(true);
+        lblDetalleCalculo.setWrapStyleWord(true);
+        lblDetalleCalculo.setOpaque(false);
+        lblDetalleCalculo.setFont(Theme.sans(Font.PLAIN, 11));
         lblDetalleCalculo.setForeground(Theme.MUTED);
-
-        seccionArea.add(lblTitArea, BorderLayout.NORTH);
-        seccionArea.add(lblAreaValor, BorderLayout.CENTER);
-        seccionArea.add(lblDetalleCalculo, BorderLayout.SOUTH);
-
-        // Ensamblar tarjeta
-        card.add(seccionPrimitiva);
-        card.add(Box.createVerticalStrut(10));
-        card.add(sep);
-        card.add(Box.createVerticalStrut(10));
-        card.add(seccionArea);
-
-        // Pie: Estado
-        lblEstado.setFont(Theme.sans(Font.BOLD, 12));
-        lblEstado.setForeground(Theme.MUTED);
-
-        add(card, BorderLayout.CENTER);
-        add(lblEstado, BorderLayout.SOUTH);
+        lblDetalleCalculo.setRows(2);
+        add(lblDetalleCalculo, BorderLayout.SOUTH);
+        setPreferredSize(new Dimension(500, 205));
     }
 
     public void mostrarResultado(ResultadoIntegral r, String funcion, Double a, Double b) {
         if (!r.isExito()) {
             txtPrimitiva.setText("Sin solución para esa expresión");
-            lblAreaValor.setText("--");
+            lblAreaValor.setText("—");
             lblDetalleCalculo.setText(r.getMensajeError());
-            setEstado("Error: " + r.getMensajeError(), Theme.RED);
+            setEstado("No se pudo resolver", Theme.RED);
             return;
         }
-
         txtPrimitiva.setText(r.getPrimitiva() + " + C");
-
         if (r.tieneEvaluacion()) {
             double area = r.getArea();
-            lblAreaValor.setText(String.format("%.6f u²", area));
+            lblAreaValor.setText(String.format("%.6f", area));
             lblAreaValor.setForeground(Theme.GREEN);
-
-            String detalle = String.format("Regla de Barrow: F(%.4f) - F(%.4f) = %.6f - (%.6f) = %.6f",
-                    b, a, r.getFb(), r.getFa(), area);
-            lblDetalleCalculo.setText(detalle);
-            setEstado("Cálculo completado con éxito mediante SWI-Prolog", Theme.GREEN);
+            lblDetalleCalculo.setText(String.format("Regla de Barrow  ·  F(%.4f) − F(%.4f) = %.6f − (%.6f) = %.6f", b, a, r.getFb(), r.getFa(), area));
+            setEstado("Cálculo completado", Theme.GREEN);
         } else {
-            lblAreaValor.setText("(Solo integral indefinida)");
-            lblAreaValor.setForeground(Theme.MUTED);
-            lblDetalleCalculo.setText("Para calcular el área proporcione los límites a y b");
-            setEstado("Antiderivada encontrada", Theme.BLUE);
+            lblAreaValor.setText("—");
+            lblDetalleCalculo.setText("Primitiva encontrada. Define un intervalo para calcular la integral definida.");
+            setEstado("Primitiva encontrada", Theme.GREEN);
         }
     }
 
-    public void setEstado(String texto, Color c) {
+    public void setEstado(String texto, Color color) {
         lblEstado.setText(texto);
-        lblEstado.setForeground(c);
+        lblEstado.setForeground(color);
     }
 
     public void limpiar() {
-        txtPrimitiva.setText("");
-        lblAreaValor.setText("--");
-        lblDetalleCalculo.setText("Ingrese función y límites para calcular");
-        setEstado("Listo", Theme.MUTED);
+        txtPrimitiva.setText("—");
+        lblAreaValor.setText("—");
+        lblDetalleCalculo.setText("Ingresa una función y pulsa calcular.");
+        setEstado("Listo para calcular", Theme.MUTED);
+    }
+
+    private static JLabel label(String texto, int tam, int estilo, Color color) {
+        JLabel l = new JLabel(texto);
+        l.setFont(Theme.sans(estilo, tam));
+        l.setForeground(color);
+        return l;
     }
 }
