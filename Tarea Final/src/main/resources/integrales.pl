@@ -8,6 +8,14 @@
 % bajo la curva entre dos límites [a, b] aplicando el Teorema Fundamental del
 % Cálculo (Regla de Barrow: Integral = F(b) - F(a)).
 % ==============================================================================
+% Integrantes:
+% Jaime Alejandro Hernandez Sandoval - 00071322
+% Elias Alejandro Milian Rivera - 00092822
+% Jose Alejandro Chavez Guardado - 00149320
+% ==============================================================================
+
+
+
 
 :- module(integrales, [
     integral/3,

@@ -301,6 +301,30 @@ public class PanelGrafico extends JPanel {
         if (expr.startsWith("sh(") && expr.endsWith(")")) return Math.sinh(evalSub(expr.substring(3, expr.length() - 1), x));
         if (expr.startsWith("cosh(") && expr.endsWith(")")) return Math.cosh(evalSub(expr.substring(5, expr.length() - 1), x));
         if (expr.startsWith("tanh(") && expr.endsWith(")")) return Math.tanh(evalSub(expr.substring(5, expr.length() - 1), x));
+        if (expr.startsWith("asinh(") && expr.endsWith(")")) {
+            double v = evalSub(expr.substring(6, expr.length() - 1), x);
+            return Math.log(v + Math.sqrt(v * v + 1.0));
+        }
+        if (expr.startsWith("arcsinh(") && expr.endsWith(")")) {
+            double v = evalSub(expr.substring(8, expr.length() - 1), x);
+            return Math.log(v + Math.sqrt(v * v + 1.0));
+        }
+        if (expr.startsWith("acosh(") && expr.endsWith(")")) {
+            double v = evalSub(expr.substring(6, expr.length() - 1), x);
+            return v >= 1.0 ? Math.log(v + Math.sqrt(v * v - 1.0)) : Double.NaN;
+        }
+        if (expr.startsWith("arccosh(") && expr.endsWith(")")) {
+            double v = evalSub(expr.substring(8, expr.length() - 1), x);
+            return v >= 1.0 ? Math.log(v + Math.sqrt(v * v - 1.0)) : Double.NaN;
+        }
+        if (expr.startsWith("atanh(") && expr.endsWith(")")) {
+            double v = evalSub(expr.substring(6, expr.length() - 1), x);
+            return Math.abs(v) < 1.0 ? 0.5 * Math.log((1.0 + v) / (1.0 - v)) : Double.NaN;
+        }
+        if (expr.startsWith("arctanh(") && expr.endsWith(")")) {
+            double v = evalSub(expr.substring(8, expr.length() - 1), x);
+            return Math.abs(v) < 1.0 ? 0.5 * Math.log((1.0 + v) / (1.0 - v)) : Double.NaN;
+        }
         if (expr.startsWith("exp(") && expr.endsWith(")")) return Math.exp(evalSub(expr.substring(4, expr.length() - 1), x));
         if (expr.startsWith("log(") && expr.endsWith(")")) return Math.log(evalSub(expr.substring(4, expr.length() - 1), x));
         if (expr.startsWith("sqrt(") && expr.endsWith(")")) return Math.sqrt(evalSub(expr.substring(5, expr.length() - 1), x));
