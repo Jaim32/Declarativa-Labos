@@ -22,12 +22,32 @@ public class VentanaPrincipal extends JFrame {
     private Buttons btnCalcular;
     private Buttons btnIndefinida;
 
-    private static final String[][] EJEMPLOS_GRUPOS = {
-        {"3*x^2 + 2*x", "x^3", "3*x", "5", "1/x"},
-        {"sin(x)", "cos(x)", "tan(x)"},
-        {"asin(x)", "acos(x)", "atan(x)"},
-        {"exp(x)", "2^x"},
-        {"sinh(x)", "cosh(x)", "tanh(x)", "asinh(x)"}
+    // Casos a–v de la prueba en integrales.pl y el caso especial 1/x.
+    // Cada fila contiene: letra, función, límite a, límite b.
+    private static final String[][] EJEMPLOS = {
+        {"a", "5", "0", "2"},
+        {"b", "x", "0", "2"},
+        {"c", "3*x", "1", "4"},
+        {"d", "x^3", "0", "2"},
+        {"d*", "1/x", "1", "2.718"},
+        {"e", "exp(x)", "0", "1"},
+        {"f", "4*sin(x)", "0", "3.14159"},
+        {"g", "3*x^2 + 2*x", "0", "2"},
+        {"h", "x^2 - cos(x)", "0", "1.57079"},
+        {"i", "2^x", "0", "3"},
+        {"j", "3^(2*x)", "0", "1"},
+        {"k", "sin(x)", "0", "3.14159"},
+        {"l", "cos(x)", "0", "1.57079"},
+        {"m", "tan(x)", "0", "0.78539"},
+        {"n", "asin(x)", "0", "0.8"},
+        {"o", "acos(x)", "0", "0.8"},
+        {"p", "atan(x)", "0", "1"},
+        {"q", "sinh(x)", "0", "1"},
+        {"r", "cosh(x)", "0", "1"},
+        {"s", "tanh(x)", "0", "1"},
+        {"t", "asinh(x)", "0", "1"},
+        {"u", "acosh(x)", "1.5", "3"},
+        {"v", "atanh(x)", "0", "0.5"}
     };
 
     public VentanaPrincipal(PrologEngine motor) {
@@ -146,26 +166,33 @@ public class VentanaPrincipal extends JFrame {
         cabecera.add(label("Prueba una función", 18, Font.BOLD, Theme.TEXT));
         card.add(cabecera, BorderLayout.NORTH);
 
-        JPanel grupos = new JPanel();
-        grupos.setOpaque(false);
-        grupos.setLayout(new BoxLayout(grupos, BoxLayout.Y_AXIS));
-        for (String[] grupo : EJEMPLOS_GRUPOS) {
-            JPanel fila = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 3));
+        JPanel casos = new JPanel(new GridLayout(0, 1, 0, 6));
+        casos.setOpaque(false);
+        for (String[] caso : EJEMPLOS) {
+            JPanel fila = new JPanel(new BorderLayout(10, 0));
             fila.setOpaque(false);
-            fila.setAlignmentX(Component.LEFT_ALIGNMENT);
-            for (String ej : grupo) {
-                Buttons chip = new Buttons(ej, Theme.CARD_HOVER, Theme.TEXT, 10, 6, 11);
-                chip.addActionListener(e -> {
-                    txtFuncion.setText(ej);
-                    ajustarLimitesPorDefecto(ej);
-                    txtFuncion.requestFocusInWindow();
-                });
-                fila.add(chip);
-            }
-            grupos.add(fila);
+            fila.add(label(caso[0] + ")", 11, Font.BOLD, Theme.GREEN), BorderLayout.WEST);
+            Buttons chip = new Buttons(caso[1], Theme.CARD_HOVER, Theme.TEXT, 10, 6, 11);
+            chip.setHorizontalAlignment(SwingConstants.LEFT);
+            chip.addActionListener(e -> {
+                txtFuncion.setText(caso[1]);
+                txtLimiteA.setText(caso[2]);
+                txtLimiteB.setText(caso[3]);
+                txtFuncion.requestFocusInWindow();
+            });
+            fila.add(chip, BorderLayout.CENTER);
+            casos.add(fila);
         }
-        card.add(grupos, BorderLayout.CENTER);
-        card.add(label("Selecciona un ejemplo para cargarlo en el campo.", 11, Font.PLAIN, Theme.MUTED), BorderLayout.SOUTH);
+        JScrollPane desplazamiento = new JScrollPane(casos,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        desplazamiento.setBorder(null);
+        desplazamiento.setOpaque(false);
+        desplazamiento.getViewport().setOpaque(false);
+        desplazamiento.getVerticalScrollBar().setUnitIncrement(30);
+        desplazamiento.setPreferredSize(new Dimension(0, 160));
+        card.add(desplazamiento, BorderLayout.CENTER);
+        card.add(label("Desplázate: 22 casos base y 1/x.", 11, Font.PLAIN, Theme.MUTED), BorderLayout.SOUTH);
         return card;
     }
 
@@ -244,22 +271,6 @@ public class VentanaPrincipal extends JFrame {
         panelResultado.limpiar();
         panelGrafico.limpiar();
         txtFuncion.requestFocusInWindow();
-    }
-
-    private void ajustarLimitesPorDefecto(String ej) {
-        if (ej.contains("asin") || ej.contains("acos")) {
-            txtLimiteA.setText("0"); txtLimiteB.setText("0.8");
-        } else if (ej.contains("atanh")) {
-            txtLimiteA.setText("0"); txtLimiteB.setText("0.5");
-        } else if (ej.contains("acosh")) {
-            txtLimiteA.setText("1.5"); txtLimiteB.setText("3");
-        } else if (ej.equals("1/x")) {
-            txtLimiteA.setText("1"); txtLimiteB.setText("2.718");
-        } else if (ej.contains("sin") || ej.contains("cos")) {
-            txtLimiteA.setText("0"); txtLimiteB.setText("3.1416");
-        } else {
-            txtLimiteA.setText("0"); txtLimiteB.setText("2");
-        }
     }
 
     private static JLabel label(String texto, int tam, int estilo, Color color) {
